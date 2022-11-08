@@ -1,0 +1,22 @@
+.pogolist {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: sp(2);
+  padding: sp(2);
+
+  @media (min-width: bp(xs)) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: bp(sm)) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: bp(md)) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (min-width: bp(lg)) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}

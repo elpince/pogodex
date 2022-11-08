@@ -1,27 +1,22 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <main class="main">
+    <pogo-list />
+  </main>
+  <pogo-filter />
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+<script setup lang="ts">
+import PogoList from '@/components/PogoList.vue'
+import { useStore } from '@/store'
+import { typeColors, types } from '@/types/type'
+import PogoFilter from '@/components/PogoFilter.vue'
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-});
+const store = useStore()
+
+store.dispatch('getPokemonList')
+
+const root = document.querySelector(':root') as HTMLElement
+types.forEach(type => {
+  root.style.setProperty(`--${type}`, typeColors[type])
+})
 </script>
-
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
