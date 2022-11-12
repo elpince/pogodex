@@ -1,15 +1,16 @@
 <template>
   <div class="pogolist">
     <pogo-card
-      v-for="(item, i) in filteredList"
+      v-for="item in filteredList"
       :key="item"
       ref="cards"
       :pokemon="{
         id: item,
         data: pokemonList[item] || formList[item],
         entry: pokedex[item],
-        visible: nextCheck > i
+        visible: visibleCards.includes(item)
       }"
+      :id="item"
       @update="(d) => updatePokedexEntry(item, d)"
     ></pogo-card>
   </div>
@@ -17,10 +18,11 @@
 
 <script setup lang="ts">
 import { useStore } from '@/store'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import PogoCard from '@/components/PogoCard.vue'
 import { PokedexUpdatePayload } from '@/types/pokedex'
 import { PokemonId } from '@/types/pokemon'
+import { whenever } from '@vueuse/core'
 
 const store = useStore()
 
@@ -49,22 +51,24 @@ const updatePokedexEntry = (id: PokemonId, { type, prop, value }: PokedexUpdateP
   })
 }
 
-const wh = ref(window.innerHeight)
-const nextCheck = ref(4)
-const cards = ref<HTMLElement[] | null>(null)
+const visibleCards = ref<PokemonId[]>([])
+const cards = ref<typeof PogoCard[] | null>(null)
 
-onMounted(() => {
-  checkElementVisibility()
-  window.addEventListener('scroll', checkElementVisibility)
+const observer = new IntersectionObserver((entries) => {
+  entries
+    .filter(entry => entry.isIntersecting)
+    .forEach(entry => {
+      visibleCards.value.push(entry.target.id)
+      observer.unobserve(entry.target)
+    })
+}, {
+  threshold: 0.2
 })
 
-const checkElementVisibility = () => {
+whenever(cards, () => {
   if (!cards.value) return
-  let visible = true
-  while (visible) {
-    nextCheck.value++
-    const r = cards.value[nextCheck.value].getBoundingClientRect()
-    if (r.top > wh.value) visible = false
-  }
-}
+  cards.value.forEach((card) => {
+    observer.observe(card.$el)
+  })
+})
 </script>
