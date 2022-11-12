@@ -7,7 +7,7 @@
       class="pogocard__img"
       :style="styles"
     >
-      <img :src="pokemon.data.img" />
+      <img v-if="pokemon.visible" :src="pokemon.data.img" />
       <div class="pogocard__states">
         <component
           v-for="(genre, key) in pokemon.entry.genre"
